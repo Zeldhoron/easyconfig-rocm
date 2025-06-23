@@ -1,0 +1,32 @@
+easyblock = 'EB_ROCmComponent'
+
+name = 'hipBLAS-common'
+version = '1.2.0'
+_rocm_version = '6.4.0'
+versionsuffix = f'-ROCm-{_rocm_version}'
+
+homepage = 'https://github.com/ROCm/hipBLAS-common'
+description = """hipBLAS-common is a header-only library that provides common files for hipBLAS and hipBLASLt."""
+
+toolchain = {'name': 'GCCcore', 'version': '13.3.0'}
+
+github_account = 'ROCm'
+source_urls = [GITHUB_SOURCE]
+sources = [f'rocm-{_rocm_version}.tar.gz']
+checksums = ['8953bcf13ba1aa03cb29481bd90eaef373bf0e41cadff68e567ecd2ec0b07363']
+
+builddependencies = [
+    ('binutils', '2.42'),
+    ('CMake', '3.29.3'),
+    ('ROCm-LLVM', f'{_rocm_version}'),
+]
+
+sanity_check_paths = {
+    'files': ['lib/cmake/hipblas-common/hipblas-common-config.cmake',
+              'include/hipblas-common/hipblas-common.h'],
+    'dirs': ['lib/cmake/hipblas-common',
+             'share/doc/hipblas-common',
+             'include/hipblas-common'],
+}
+
+moduleclass = 'lib'

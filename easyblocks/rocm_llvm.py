@@ -31,10 +31,10 @@ EasyBuild support for building and installing ROCm-LLVM, AMD's fork of the LLVM 
 import os
 
 from easybuild.tools import LooseVersion
-from easybuild.easyblocks.llvm import EB_LLVM, general_opts
+from easybuild.easyblocks.llvm import EB_LLVMtest, general_opts
 from easybuild.tools.filetools import apply_regex_substitutions, mkdir, remove_dir
 
-class EB_ROCm_minus_LLVM(EB_LLVM):
+class EB_ROCm_minus_LLVM(EB_LLVMtest):
     """
     Support for building the ROCm-LLVM compilers with some modifications on top of the LLVM easyblock.
     """
