@@ -26,19 +26,19 @@ checksums = [
     # rocm-6.4.0.tar.gz
     'a4baa0c7336db9d46a0884c8ccfd0fb7e00a502b478aed9f588aa26fa8773353',
     # hipBLASLt-0.12.1_use-correct-msgpack.patch
-    '64350b428f24e39758de5e004210028637c6a781a24d5b25a92abbc82da3881c',
+    '93b0c1a33c4c0bf16c6d5e274b1e18c7e6f82759cbd7ee7b3cb3ef8a5be5c1cb',
     # hipBLASLt-0.12.1_handle-clang-correctly.patch
-    '36b6e295919e3a82c96526ef0cc3a0f4ba6fa61f1689dc3328c59d09f0778d22',
+    '294f08f31f1a03e083074dca007ed312f202ce31a5a5dccfdeef9e81d1624a55',
     # hipBLASLt-0.12.1_use-easybuild-paths.patch
     'a7e341bb68e0854b5b3bae68c6a0927d30a768986f5fc904b6ff736daacb3389',
 ]
 
 builddependencies = [
     ('binutils', '2.42'),
-    ('CMake', '3.31.3'),
-    ('git', '2.49.0'),
+    ('CMake', '3.29.3'),
+    ('git', '2.45.1'),
     ('msgpack-cxx', '7.0.0'),
-    ('Python', '3.13.1'),
+    ('Python', '3.12.3'),
     ('ROCm-LLVM', f'{_rocm_version}'),
 ]
 dependencies = [

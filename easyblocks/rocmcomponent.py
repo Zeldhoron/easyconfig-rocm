@@ -95,7 +95,7 @@ class EB_ROCmComponent(CMakeMake):
             self.cfg['configopts'] += f'-DCMAKE_HIP_COMPILER={amdclangxx_mock} '
 
         self.cfg['configopts'] += f'-DHIP_PLATFORM={self.cfg["hip_platform"]} '
-        amd_gfx_list = build_option('amdgcn_capabilities') or self.cfg['amdgcn_capabilities'] or []
+        amd_gfx_list =  ['gfx900', 'gfx906', 'gfx908']  
         if amd_gfx_list and self.cfg['hip_platform'] == 'amd':
             # For now, pass both AMDGPU_TARGETS and GPU_TARGETS, until AMD finally drops the former for all packages.
             self.cfg['configopts'] += f'-DAMDGPU_TARGETS={list_to_cmake_arg(amd_gfx_list)} '
