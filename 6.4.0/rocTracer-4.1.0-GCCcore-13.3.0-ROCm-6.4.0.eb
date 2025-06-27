@@ -1,4 +1,4 @@
-easyblock = 'EB_ROCmComponent'
+easyblock = 'CMakeMake'
 
 name = 'rocTracer'
 version = '4.1.0'
@@ -28,6 +28,12 @@ builddependencies = [
 dependencies = [
     ('HIP', f'{_rocm_version}', '-amd'),
 ]
+
+
+check_readelf_rpath = False
+configopts = '-DCMAKE_C_COMPILER=$EBROOTROCMMINLLVM/bin/clang'
+configopts += ' -DCMAKE_CXX_COMPILER=$EBROOTROCMMINLLVM/bin/clang++'
+
 
 sanity_check_paths = {
     'files': ['lib/libroctracer64.so',

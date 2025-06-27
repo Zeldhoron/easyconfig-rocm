@@ -1,0 +1,41 @@
+easyblock = 'EB_ROCmComponent'
+
+name = 'hipRAND'
+version = '2.13.0'
+_rocm_version = '6.4.0'
+versionsuffix = f'-ROCm-{_rocm_version}'
+
+homepage = 'https://github.com/ROCm/hipRAND'
+description = """hipRAND is a RAND marshalling library with multiple supported backends.
+It sits between your application and the backend RAND library, where it marshals inputs
+to the backend and results to the application. hipRAND exports an interface that doesn't
+require the client to change, regardless of the chosen backend."""
+docurls = ['https://rocm.docs.amd.com/projects/hipRAND/en/latest/']
+
+toolchain = {'name': 'GCCcore', 'version': '13.3.0'}
+
+github_account = 'ROCm'
+source_urls = [GITHUB_SOURCE]
+sources = [f'rocm-{_rocm_version}.tar.gz']
+checksums = ['60e9153edf617e984361696aa60af3ad44c5ae01ed75ad610c617a387b0559a4']
+
+builddependencies = [
+    ('binutils', '2.42'),
+    ('CMake', '3.29.3'),
+    ('ROCm-LLVM', f'{_rocm_version}'),
+]
+dependencies = [
+    ('HIP', f'{_rocm_version}', '-amd'),
+    ('rocRAND', '3.3.0', f'-ROCm-{_rocm_version}'),
+]
+
+sanity_check_paths = {
+    'files': ['lib/libhiprand.so',
+              'lib/cmake/hiprand/hiprand-config.cmake',
+              'include/hiprand/hiprand.hpp'],
+    'dirs': ['lib/cmake/hiprand',
+             'share/doc/hiprand',
+             'include/hiprand'],
+}
+
+moduleclass = 'lib'

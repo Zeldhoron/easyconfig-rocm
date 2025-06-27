@@ -1,0 +1,10 @@
+--- Tensile-rocm-6.4.0.orig/Tensile/TensileCreateLibrary.py	2025-06-27 13:47:23.616618837 +0200
++++ Tensile-rocm-6.4.0/Tensile/TensileCreateLibrary.py	2025-06-27 15:04:26.710005523 +0200
+@@ -1476,6 +1476,7 @@
+ 
+     # Make sure to copy the library static files.
+     for fileName in staticFiles:
++        os.chmod(os.path.join(outputPath, fileName), 0o755)
+         shutil.copy(os.path.join(globalParameters["SourcePath"], fileName), outputPath)
+ 
+     codeObjectFiles, kernels, solutions = writeKernels(

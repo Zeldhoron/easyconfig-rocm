@@ -44,7 +44,7 @@ builddependencies = [
 dependencies = [
     ('HIP', f'{_rocm_version}', '-amd'),
     ('hipBLAS-common', '1.2.0', f'-ROCm-{_rocm_version}'),
-    ('rocTracer', f'{_rocm_version}'),
+    ('rocTracer', '4.1.0', f'-ROCm-{_rocm_version}'),
 ]
 
 # Build options as specified in AMD build scripts and TheRock monobuild repo

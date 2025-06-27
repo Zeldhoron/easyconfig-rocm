@@ -9,7 +9,6 @@ homepage = 'https://github.com/ROCm/rocBLAS'
 description = """rocBLAS is the ROCm Basic Linear Algebra Subprograms (BLAS) library.
 rocBLAS is implemented in the HIP programming language and optimized for AMD GPUs."""
 docurls = ['https://rocm.docs.amd.com/projects/rocBLAS/en/latest/']
-
 toolchain = {'name': 'GCC', 'version': '13.3.0'}
 
 github_account = 'ROCm'
@@ -26,7 +25,7 @@ builddependencies = [
 ]
 dependencies = [
     ('HIP', f'{_rocm_version}', '-amd'),
-    ('rocTracer',  f'{_rocm_version}'),
+    ('rocTracer', '4.1.0', f'-ROCm-{_rocm_version}'),
     ('hipBLASLt', '0.12.1', f'-ROCm-{_rocm_version}'),
 ]
 
