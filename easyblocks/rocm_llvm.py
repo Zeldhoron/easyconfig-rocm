@@ -27,14 +27,15 @@
 EasyBuild support for building and installing ROCm-LLVM, AMD's fork of the LLVM compiler infrastructure.
 
 @author: Bob Dröge (University of Groningen)
+@author: Anthony Beerens (Inuits)
 """
 import os
 
 from easybuild.tools import LooseVersion
-from easybuild.easyblocks.llvm import EB_LLVMtest, general_opts
-from easybuild.tools.filetools import apply_regex_substitutions, mkdir, remove_dir
+from easybuild.easyblocks.llvm import EB_LLVM
+from easybuild.tools.filetools import apply_regex_substitutions, remove_dir
 
-class EB_ROCm_minus_LLVM(EB_LLVMtest):
+class EB_ROCm_minus_LLVM(EB_LLVM):
     """
     Support for building the ROCm-LLVM compilers with some modifications on top of the LLVM easyblock.
     """
