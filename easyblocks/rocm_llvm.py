@@ -27,13 +27,17 @@
 EasyBuild support for building and installing ROCm-LLVM, AMD's fork of the LLVM compiler infrastructure.
 
 @author: Bob Dröge (University of Groningen)
+@author: Jan Andre Reuter (jan@zyten.de)
 @author: Anthony Beerens (Inuits)
 """
 import os
 
 from easybuild.tools import LooseVersion
 from easybuild.easyblocks.llvm import EB_LLVM
-from easybuild.tools.filetools import apply_regex_substitutions, remove_dir
+from easybuild.tools.filetools import apply_regex_substitutions, remove_dir, which
+from easybuild.tools.build_log import EasyBuildError
+from easybuild.tools.config import build_option
+
 
 class EB_ROCm_minus_LLVM(EB_LLVM):
     """
@@ -44,23 +48,37 @@ class EB_ROCm_minus_LLVM(EB_LLVM):
         super(EB_ROCm_minus_LLVM, self)._configure_general_build()
         self._cmakeopts.update({
             'LLVM_EXTERNAL_PROJECTS': '"device-libs"',
-            'LLVM_EXTERNAL_DEVICE_LIBS_SOURCE_DIR': os.path.join(self.llvm_src_dir, 'amd', 'device-libs '),
+            'LLVM_EXTERNAL_DEVICE_LIBS_SOURCE_DIR': os.path.join(self.llvm_src_dir, 'amd', 'device-libs'),
             'LLVM_ENABLE_PER_TARGET_RUNTIME_DIR': 'ON',
+            'LLVM_TARGETS_TO_BUILD': '"X86;AMDGPU"',
+            'CLANG_ENABLE_AMDCLANG': 'ON',
             'CLANG_DEFAULT_RTLIB': 'compiler-rt',
             'CLANG_DEFAULT_UNWINDLIB': 'libgcc',
             'DEFAULT_ROCM_PATH': self.installdir,
+            'LIBOMP_COPY_EXPORTS': 'OFF',
         })
 
-
+        amd_gfx_list = build_option('amdgcn_capabilities', default=[])
+        if not amd_gfx_list and 'amdgcn_capabilities' in self.cfg:
+            amd_gfx_list = self.cfg['amdgcn_capabilities']
+        if not amd_gfx_list and 'AMDGCN_CAPABILITIES' in os.environ:
+            amd_gfx_list = os.environ.get('AMDGCN_CAPABILITIES').split(',')
+        if not amd_gfx_list:
+            raise EasyBuildError("Expected amdgcn_capabilities to be set to build this EasyConfig. "
+                                 "Please specify either --amdgcn_capabilities, or set amdgcn_capabilities "
+                                 "in the EasyConfig!")
         if LooseVersion('19') <= LooseVersion(self.version) < LooseVersion('20'):
-            self.runtimes_cmake_args['LIBOMPTARGET_AMDGCN_GFXLIST'] = '%s' % '|'.join(self.amd_gfx)
+            self.runtimes_cmake_args['LIBOMPTARGET_AMDGCN_GFXLIST'] = '%s' % '|'.join(amd_gfx_list)
+
+        intermediate_stage_dir = self.llvm_obj_dir_stage2 if self.cfg['bootstrap'] else self.llvm_obj_dir_stage1
         self.runtimes_cmake_args['AMDDeviceLibs_DIR'] = os.path.join(
-            self.llvm_obj_dir_stage2, 'tools', 'device-libs', 'lib64', 'cmake', 'AMDDeviceLibs'
+            intermediate_stage_dir, 'tools', 'device-libs', 'lib64', 'cmake', 'AMDDeviceLibs'
         )
         self._add_cmake_runtime_args()
 
     def configure_step(self):
-        # the openmp component uses the same build dirs, so we need to remove them to make sure that we start with clean ones
+        # the openmp component uses the same build dirs, so we need to remove them to make
+        # sure that we start with clean ones
         if os.path.exists(os.path.join(self.builddir, 'llvm.obj.1', 'CMakeCache.txt')):
             remove_dir(os.path.join(self.builddir, 'llvm.obj.1'))
             remove_dir(os.path.join(self.builddir, 'llvm.obj.2'))
@@ -69,19 +87,42 @@ class EB_ROCm_minus_LLVM(EB_LLVM):
 
         if 'openmp' in self.final_projects:
             # fix path to include dir for omp.h:
-            omp_header_regex = [(r'\${CMAKE_BINARY_DIR}/projects/openmp/runtime/src', '${CMAKE_BINARY_DIR}/../../projects/openmp/runtime/src')]
-            apply_regex_substitutions(os.path.join(self.llvm_src_dir, 'offload',  'DeviceRTL', 'CMakeLists.txt'), omp_header_regex)
+            omp_header_regex = [(r'\${CMAKE_BINARY_DIR}/projects/openmp/runtime/src',
+                                '${CMAKE_BINARY_DIR}/../../projects/openmp/runtime/src')]
+            apply_regex_substitutions(os.path.join(self.llvm_src_dir, 'offload',  'DeviceRTL', 'CMakeLists.txt'),
+                                      omp_header_regex)
 
-        # no hardcoded path to clang to make sure it picks up the right ones (which can be the RPATH wrappers)
-        amdllvm_cmakelists = os.path.join(self.llvm_src_dir, 'clang-tools-extra', 'amdllvm', 'CMakeLists.txt')
-        apply_regex_substitutions(amdllvm_cmakelists, [(r'set\(CMAKE_CXX_COMPILER', '# set(CMAKE_CXX_COMPILER')])
+        # ROCm hardcodes the path to the just built Clang. This interferes with our RPATH wrappers.
+        # Therefore, patch hardcoded CMAKE_CXX_COMPILER to use our wrappers, if rpath wrapping is enabled.
+        # Do NOT simply unset CMAKE_CXX_COMPILER, or else GCC might be picked up if bootstrap is disabled,
+        # conflicting with using `-stdlib=libc++`
+        if build_option('rpath'):
+            self._prepare_runtimes_rpath_wrappers(self.llvm_obj_dir_stage1)
+            amdllvm_cmakelists = os.path.join(self.llvm_src_dir, 'clang-tools-extra', 'amdllvm', 'CMakeLists.txt')
+            mock_clangxx = which('clang++')
+            apply_regex_substitutions(amdllvm_cmakelists,
+                                      [(r'set\(CMAKE_CXX_COMPILER ${CMAKE_BINARY_DIR}/bin/clang\+\+\)',
+                                        'set(CMAKE_CXX_COMPILER %s)' % mock_clangxx)])
+
+    def build_with_prev_stage(self, prev_dir, stage_dir):
+        # Similar handling to case above, just for multi-stage build.
+        # Here, we need to create mock wrappers ourselves, as call to LLVM build will start the build process.
+        if build_option('rpath'):
+            self._prepare_runtimes_rpath_wrappers(stage_dir)
+            mock_clangxx = which('clang++')
+            amdllvm_cmakelists = os.path.join(self.llvm_src_dir, 'clang-tools-extra', 'amdllvm', 'CMakeLists.txt')
+            apply_regex_substitutions(amdllvm_cmakelists,
+                                      [(r'set\(CMAKE_CXX_COMPILER ${CMAKE_BINARY_DIR}/bin/clang\+\+\)',
+                                        'set(CMAKE_CXX_COMPILER %s)' % mock_clangxx)])
+
+        super(EB_ROCm_minus_LLVM, self).build_with_prev_stage(prev_dir, stage_dir)
 
     def _configure_final_build(self):
         super(EB_ROCm_minus_LLVM, self)._configure_final_build()
         self._cmakeopts.update({
             'LIBOMP_OMPD_SUPPORT': 'ON',
-            'CLANG_ENABLE_AMDCLANG': 'ON',
-            #'LIBOMPTARGET_FORCE_DLOPEN_LIBHSA': 'ON', # doesn't seem to work
+            # Explicitly disable LIBOMPTARGET_FORCE_DLOPEN_LIBHSA, as this breaks the offload build with OMPT
+            # otherwise.
+            'LIBOMPTARGET_FORCE_DLOPEN_LIBHSA': 'OFF',
         })
         self._configure_general_build()
-
