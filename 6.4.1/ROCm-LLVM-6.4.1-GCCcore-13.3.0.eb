@@ -70,7 +70,6 @@ components = [
         #'configopts': '-DCLANG_ENABLE_AMDCLANG=ON -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON '
         #              '-DCLANG_DEFAULT_RTLIB=compiler-rt -DCLANG_DEFAULT_UNWINDLIB=libgcc ',
         #'bootstrap': False,
-        'amd_gfx_list': local_amd_gfx_list,
         'build_lld': True,
         'build_clang_extras': True,
         'build_openmp_offload': False, #True,
