@@ -43,6 +43,15 @@ local_common_cmake_configopts = ' '.join([
     '-DLLVM_DIR=%(installdir)s/lib/cmake/llvm',
 ])
 
+checksums = [{
+    'llvm-project-rocm-6.4.1.tar.gz':
+        '460ad28677092b9eb86ffdc49bcb4d01035e32b4f05161d85f90c9fa80239f50',
+    'ROCR-Runtime-rocm-6.4.1.tar.gz':
+        'f72d100a46a2dd9f4c870cef156604777f1bdb1841df039d14bf37b19814b9da',
+    'aomp-extras-rocm-6.4.1.tar.gz':
+        'cf20b02b1f99f506c198866ef03f2265dc355627760f82cda3878d5bc6486afc',
+}]
+
 default_easyblock = 'CMakeMake'
 
 default_component_specs = {

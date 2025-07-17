@@ -10,7 +10,7 @@ description = """ROCM cmake modules provides cmake modules for common build
 tasks needed for the ROCM software stack"""
 docurls = ['https://rocm.docs.amd.com/projects/roctracer/']
 
-toolchain = {'name': 'GCCcore', 'version': '13.3.0'}
+toolchain = {'name': 'LLVMtc', 'version': '6.4.1'}
 
 github_account = 'ROCm'
 source_urls = [GITHUB_SOURCE]
@@ -23,17 +23,10 @@ builddependencies = [
     ('CppHeaderParser', '2.7.4'),
     ('Doxygen', '1.11.0'),
     ('Python', '3.12.3'),
-    ('ROCm-LLVM', f'{_rocm_version}'),
 ]
 dependencies = [
     ('HIP', f'{_rocm_version}', '-amd'),
 ]
-
-
-check_readelf_rpath = False
-configopts = '-DCMAKE_C_COMPILER=$EBROOTROCMMINLLVM/bin/clang'
-configopts += ' -DCMAKE_CXX_COMPILER=$EBROOTROCMMINLLVM/bin/clang++'
-
 
 sanity_check_paths = {
     'files': ['lib/libroctracer64.so',
