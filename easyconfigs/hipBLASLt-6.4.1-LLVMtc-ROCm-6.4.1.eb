@@ -1,9 +1,7 @@
-easyblock = 'EB_ROCmComponent'
+easyblock = 'CMakeMake'
 
 name = 'hipBLASLt'
-version = '0.12.1'
-_rocm_version = '6.4.1'
-versionsuffix = f'-ROCm-{_rocm_version}'
+version = '6.4.1'
 
 homepage = 'https://github.com/ROCm/hipBLASLt'
 description = """hipBLASLt is a library that provides general matrix-matrix operations.
@@ -12,24 +10,24 @@ such as adding flexibility to matrix data layouts, input types, compute types, a
 algorithmic implementations and heuristics."""
 docurls = ['https://rocm.docs.amd.com/projects/hipBLASLt/en/latest/']
 
-toolchain = {'name': 'GCC', 'version': '13.3.0'}
+toolchain = {'name': 'LLVMtc', 'version': 'ROCm-6.4.1'}
 
 github_account = 'ROCm'
 source_urls = [GITHUB_SOURCE]
-sources = [f'rocm-{_rocm_version}.tar.gz']
+sources = ['rocm-%(version)s.tar.gz']
 patches = [
-    'hipBLASLt-0.12.1_use-correct-msgpack.patch',
-    'hipBLASLt-0.12.1_handle-clang-correctly.patch',
-    'hipBLASLt-0.12.1_use-easybuild-paths.patch',
+    'hipBLASLt-6.4.1-LLVMtc-ROCm-6.4.1_use_correct_msgpack.patch',
+    'hipBLASLt-6.4.1-LLVMtc-ROCm-6.4.1_handle_clang_correctly.patch',
+    'hipBLASLt-6.4.1-LLVMtc-ROCm-6.4.1_use_easybuild_paths.patch',
 ]
 checksums = [
     # rocm-6.4.1.tar.gz
     '929f781f86df40143c3ab98df2d746170dedb6788e368335e24c84796285a8a4',
-    # hipBLASLt-0.12.1_use-correct-msgpack.patch
+    # hipBLASLt-6.4.1-LLVMtc-ROCm-6.4.1_use_correct_msgpack.patch
     '93b0c1a33c4c0bf16c6d5e274b1e18c7e6f82759cbd7ee7b3cb3ef8a5be5c1cb',
-    # hipBLASLt-0.12.1_handle-clang-correctly.patch
+    # hipBLASLt-6.4.1-LLVMtc-ROCm-6.4.1_handle_clang_correctly.patch
     '294f08f31f1a03e083074dca007ed312f202ce31a5a5dccfdeef9e81d1624a55',
-    # hipBLASLt-0.12.1_use-easybuild-paths.patch
+    # hipBLASLt-6.4.1-LLVMtc-ROCm-6.4.1_use_easybuild_paths.patch
     'a7e341bb68e0854b5b3bae68c6a0927d30a768986f5fc904b6ff736daacb3389',
 ]
 
@@ -39,12 +37,11 @@ builddependencies = [
     ('git', '2.45.1'),
     ('msgpack-cxx', '7.0.0'),
     ('Python', '3.12.3'),
-    ('ROCm-LLVM', f'{_rocm_version}'),
 ]
 dependencies = [
-    ('HIP', f'{_rocm_version}', '-amd'),
-    ('hipBLAS-common', '1.2.0', f'-ROCm-{_rocm_version}'),
-    ('rocTracer', '4.1.0', f'-ROCm-{_rocm_version}'),
+    ('HIP', '%(version)s'),
+    ('ROCTracer', '%(version)s'),
+    ('hipBLAS-common', '%(version)s'),
 ]
 
 # Build options as specified in AMD build scripts and TheRock monobuild repo

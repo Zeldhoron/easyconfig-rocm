@@ -1,8 +1,7 @@
 easyblock = 'PythonBundle'
 
 name = 'Tensile'
-version = '4.43.0'
-_rocm_version = '6.4.0'
+version = '6.4.1'
 
 homepage = 'https://github.com/ROCm/Tensile'
 description = """Tensile is a tool for creating benchmark-driven backend libraries for
@@ -11,14 +10,14 @@ contractions on a GPU. The Tensile library is mainly used as a backend library f
 Tensile acts as the performance backbone for a wide variety of 'compute' applications
 running on AMD GPUs."""
 docurls = ['https://rocm.docs.amd.com/projects/Tensile/en/latest/']
-toolchain = {'name': 'GCC', 'version': '13.3.0'}
+
+toolchain = {'name': 'LLVMtc', 'version': 'ROCm-6.4.1'}
 
 builddependencies = [
     ('binutils', '2.42'),
     ('poetry', '1.8.3'),
     ('Cython', '3.0.10')
 ]
-
 dependencies = [
     ('Python', '3.12.3'),
     ('PyYAML', '6.0.2'),
@@ -27,6 +26,7 @@ dependencies = [
     # its messy. Also bumps this EasyConfig to GCC from GCCcore, due to msgpack-cxx relying on Boost...
     ('msgpack-cxx', '7.0.0'),
 ]
+
 github_account = 'ROCm'
 exts_list = [
     ('joblib', '1.5.1', {
@@ -44,8 +44,8 @@ exts_list = [
     (name, version, {
         'modulename': 'Tensile',
         'source_urls': ['https://github.com/%(github_account)s/%(name)s/archive'],
-        'sources': ['rocm-6.4.0.tar.gz'],
-        'patches': ['tensile_output_path_permissions.patch'],
+        'sources': ['rocm-%(version)s.tar.gz'],
+        'patches': ['Tensile-6.4.1-LLVMtc-ROCm-6.4.1_output_path_permissions.patch'],
         'checksums': ['cfe32aa31aa0dd79018d0cdd36e09df3a548159cb7b8e18d0ef6513d0febce90'],
     }),
 ]
