@@ -1,6 +1,6 @@
 easyblock = 'CMakeMake'
 
-name = 'amdsmi'
+name = 'AMDSMI'
 version = '6.4.1'
 
 homepage = 'https://github.com/ROCm/amdsmi'
@@ -10,7 +10,7 @@ It provides a user-space interface that allows applications to control GPU opera
 monitor performance, and retrieve information about the system's drivers and GPUs."""
 docurls = ['https://rocmdocs.amd.com/projects/amdsmi/']
 
-toolchain = {'name': 'GCCcore', 'version': '13.3.0'}
+toolchain = {'name': 'LLVMtc', 'version': 'ROCm-6.4.1'}
 
 github_account = 'ROCm'
 source_urls = [GITHUB_SOURCE]

@@ -20,5 +20,4 @@ builddependencies = [
     ('binutils', '2.42'),
 ]
 
-
 moduleclass = 'system'

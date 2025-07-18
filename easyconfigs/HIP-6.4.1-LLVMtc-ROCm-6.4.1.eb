@@ -3,7 +3,6 @@ easyblock = 'Bundle'
 name = 'HIP'
 _rocm_version = '6.4.1'
 version = _rocm_version
-versionsuffix = '-amd'
 
 homepage = 'https://github.com/ROCm/HIP'
 description = """HIP is a C++ Runtime API and Kernel Language that allows
@@ -11,7 +10,7 @@ developers to create portable applications for AMD and NVIDIA GPUs from single
 source code."""
 docurls = ['https://rocmdocs.amd.com/projects/HIP/']
 
-toolchain = {'name': 'GCCcore', 'version': '13.3.0'}
+toolchain = {'name': 'LLVMtc', 'version': 'ROCm-6.4.1'}
 
 builddependencies = [
     ('binutils', '2.42'),
@@ -25,10 +24,9 @@ dependencies = [
     ('numactl', '2.0.18'),
     ('Perl', '5.38.2'),
     ('libglvnd', '1.7.0'),
-    ('ROCm-LLVM', '%(version)s'),
-    ('rocm-cmake', '%(version)s'),
-    ('rocminfo', '%(version)s'),
-    ('rocprofiler-register', '%(version)s'),
+    ('ROCmInfo', '%(version)s'),
+    ('ROCm-CMake', '%(version)s'),
+    ('ROCprofiler-register', '%(version)s'),
 ]
 
 default_easyblock = 'CMakeMake'
@@ -45,12 +43,12 @@ default_component_specs = {
 components = [
     ('HIPCC', 'rocm-%s' % _rocm_version, {
         'sources': [{'filename': 'llvm-project-%(version)s.tar.gz', 'alt_location': 'ROCm-LLVM'}],
-        'patches': [('HIP-6.4.1_correct_paths_clang_and_rocm_agent_enum.patch',
+        'patches': [('HIP-6.4.1-LLVMtc-ROCm-6.4.1_correct_paths_clang_and_rocm_agent_enum.patch',
                      'llvm-project-rocm-%s' % _rocm_version)],
         'checksums': [
             # llvm-project-rocm-6.4.1.tar.gz
             '460ad28677092b9eb86ffdc49bcb4d01035e32b4f05161d85f90c9fa80239f50',
-            # HIP-6.4.1_correct_paths_clang_and_rocm_agent_enum.patch
+            # HIP-6.4.1-LLVMtc-ROCm-6.4.1_correct_paths_clang_and_rocm_agent_enum.patch
             'ab58ee1bae0b5c4cec293063758da119dd6c90f944e6821141205dfe1bdbb47e',
         ],
         'srcdir': 'llvm-project-rocm-%s/amd/hipcc' % _rocm_version,
@@ -69,8 +67,8 @@ components = [
             },
         ],
         'checksums': [
-            '18ee75a04f6fc55e72f8b3fcad1e0d58eceb2ce0e0696ca76d9b3dfaf4bfd7ff',  # clr-rocm-6.4.1.tar.gz
-            'f26f098b08504636c6f4e1da45b162f1df2ce6608eba85606fa7932d8fea960f',  # HIP-rocm-6.4.1.tar.gz
+            '18ee75a04f6fc55e72f8b3fcad1e0d58eceb2ce0e0696ca76d9b3dfaf4bfd7ff', # clr-rocm-6.4.1.tar.gz
+            'f26f098b08504636c6f4e1da45b162f1df2ce6608eba85606fa7932d8fea960f', # HIP-rocm-6.4.1.tar.gz
         ],
         'srcdir': 'clr-rocm-%s' % _rocm_version,
         'configopts': '-DHIP_COMMON_DIR=%(builddir)s/hip-%(version)s/ -DHIP_PLATFORM=amd ' +
