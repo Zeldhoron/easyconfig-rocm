@@ -31,27 +31,26 @@ dependencies = [
 
 default_easyblock = 'CMakeMake'
 
-default_component_specs = {
-    'source_urls': ['https://github.com/ROCm/%(name)s/archive/'],
-    'sources': [{
-        'download_filename': '%(version)s.tar.gz',
-        'filename': '%(name)s-%(version)s.tar.gz',
-    }],
-    'srcdir': '%(name)s-%(version)s',
-}
-
 components = [
     ('HIPCC', 'rocm-%s' % _rocm_version, {
-        'sources': [{'filename': 'llvm-project-%(version)s.tar.gz', 'alt_location': 'ROCm-LLVM'}],
+        'sources': [
+            {
+                'source_urls': ['https://github.com/ROCm/llvm-project/archive/'],
+                'download_filename': '%(version)s.tar.gz',
+                'filename': 'llvm-project-%(version)s.tar.gz',
+                'alt_location': 'ROCm-LLVM',
+                'extract_cmd': 'tar xfz %s && mv llvm-project-%(version)s llvm-project-%(version)s.src',
+            },
+        ],
         'patches': [('HIP-6.4.1-LLVMtc-ROCm-6.4.1_correct_paths_clang_and_rocm_agent_enum.patch',
-                     'llvm-project-rocm-%s' % _rocm_version)],
+                     'llvm-project-%(version)s.src')],
         'checksums': [
             # llvm-project-rocm-6.4.1.tar.gz
             '460ad28677092b9eb86ffdc49bcb4d01035e32b4f05161d85f90c9fa80239f50',
             # HIP-6.4.1-LLVMtc-ROCm-6.4.1_correct_paths_clang_and_rocm_agent_enum.patch
             'ab58ee1bae0b5c4cec293063758da119dd6c90f944e6821141205dfe1bdbb47e',
         ],
-        'srcdir': 'llvm-project-rocm-%s/amd/hipcc' % _rocm_version,
+        'srcdir': 'llvm-project-%(version)s.src/amd/hipcc',
     }),
     ('HIP', 'rocm-%s' % _rocm_version, {
         'sources': [
