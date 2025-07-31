@@ -1,19 +1,18 @@
-easyblock = 'EB_ROCmComponent'
+easyblock = 'CMakeMake'
 
 name = 'rocBLAS'
-version = '4.4.0'
-_rocm_version = '6.4.1'
-versionsuffix = f'-ROCm-{_rocm_version}'
+version = '6.4.1'
 
 homepage = 'https://github.com/ROCm/rocBLAS'
 description = """rocBLAS is the ROCm Basic Linear Algebra Subprograms (BLAS) library.
 rocBLAS is implemented in the HIP programming language and optimized for AMD GPUs."""
 docurls = ['https://rocm.docs.amd.com/projects/rocBLAS/en/latest/']
-toolchain = {'name': 'GCC', 'version': '13.3.0'}
+
+toolchain = {'name': 'LLVMtc', 'version': 'ROCm-6.4.1'}
 
 github_account = 'ROCm'
 source_urls = [GITHUB_SOURCE]
-sources = [f'rocm-{_rocm_version}.tar.gz']
+sources = ['rocm-%(version)s.tar.gz']
 checksums = ['517950ff6b3715dee8b2bcfbdd3968c65e1910e4b8e353e148574ae08aa6dc73']
 
 builddependencies = [
@@ -21,15 +20,14 @@ builddependencies = [
     ('CMake', '3.29.3'),
     ('Python', '3.12.3'),
     ('Tensile', '4.43.0'),
-    ('ROCm-LLVM', f'{_rocm_version}'),
 ]
 dependencies = [
-    ('HIP', f'{_rocm_version}', '-amd'),
-    ('rocTracer', '4.1.0', f'-ROCm-{_rocm_version}'),
-    ('hipBLASLt', '0.12.1', f'-ROCm-{_rocm_version}'),
+    ('HIP', '%(version)s'),
+    ('rocTracer', '%(version)s'),
+    #('hipBLASLt', '%(version)s'),
 ]
 
-configopts = '-DBUILD_WITH_PIP=OFF '
+configopts = '-DBUILD_WITH_PIP=OFF -DBUILD_WITH_HIPBLASLT=OFF '
 
 sanity_check_paths = {
     'files': ['lib/librocblas.so',
